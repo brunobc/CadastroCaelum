@@ -1,7 +1,11 @@
 package br.hue.caelum;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -39,5 +43,24 @@ public class ListaAlunosActivity extends Activity {
             }
 		});
 	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+	    MenuInflater inflater = this.getMenuInflater();
+	    inflater.inflate(R.menu.menu_principal, menu);
+	    return super.onCreateOptionsMenu(menu);
+	}
+	
+	@Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+      switch (item.getItemId()) {
+        case R.id.menu_novo:
+        	Intent intent = new Intent(ListaAlunosActivity.this, FormularioActivity.class);
+            startActivity(intent);
+            return false;
+        default:
+            return super.onOptionsItemSelected(item);
+        }
+    }
 
 }
