@@ -7,9 +7,10 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteOpenHelper;
 import br.hue.caelum.modelo.Aluno;
+import br.hue.caelum.utils.Extras;
 
 public class AlunoDAO {
-    private static final String TABELA = "ALUNOS";
+    
     private SQLiteOpenHelper helper;
 
 	public AlunoDAO(DBHelper helper) {
@@ -19,7 +20,16 @@ public class AlunoDAO {
 	public void insere(Aluno aluno) {
 		ContentValues values = toContentValues(aluno);
 		
-		this.helper.getWritableDatabase().insert(TABELA, null, values);
+		this.helper.getWritableDatabase().insert(Extras.TABELA, null, values);
+	}
+	
+	public void altera(Aluno aluno) {
+		ContentValues values = toContentValues(aluno);
+		System.out.println(aluno);
+		System.out.println(aluno.getId());
+		String[] idParaSerAlterado = { aluno.getId().toString() }; 
+
+		this.helper.getWritableDatabase().update(Extras.TABELA, values, "id=?", idParaSerAlterado);
 	}
 	
 	public void close() {
@@ -29,6 +39,7 @@ public class AlunoDAO {
 	public ContentValues toContentValues(Aluno aluno) {
 		ContentValues values = new ContentValues();
 		values.put("nome", aluno.getNome());
+		values.put("nota", aluno.getNota());
 		values.put("endereco", aluno.getEndereco());
 		values.put("site", aluno.getSite());
 		values.put("telefone", aluno.getTelefone());
@@ -37,7 +48,7 @@ public class AlunoDAO {
 	}
 	
 	public List<Aluno> getLista() {
-		String sql = "SELECT * FROM " + TABELA + ";";
+		/*String sql = "SELECT * FROM " + Extras.TABELA + ";";
 		Cursor cursor = this.helper.getReadableDatabase().rawQuery(sql, null);
 		
 		List<Aluno> alunos = new ArrayList<>();
@@ -48,9 +59,35 @@ public class AlunoDAO {
 		    aluno.setSite(cursor.getString(cursor.getColumnIndex("site")));
 		    aluno.setTelefone(cursor.getString(cursor.getColumnIndex("telefone")));
 		    aluno.setCaminhoFoto(cursor.getString(cursor.getColumnIndex("caminhoFoto")));
+		    aluno.setNota(cursor.getDouble(cursor.getColumnIndex("nota")));
+		    
 		    alunos.add(aluno);
 		}
+		return alunos;*/
+		List<Aluno> alunos = new ArrayList<Aluno>();
+		Cursor cursor = this.helper.getWritableDatabase().query(Extras.TABELA,
+				Extras.COLUNAS, null, null, null, null, null);
+		while (cursor.moveToNext()) {
+			Aluno aluno = new Aluno();
+			aluno.setId(cursor.getLong(0));
+			aluno.setNome(cursor.getString(1));
+			aluno.setTelefone(cursor.getString(2));
+			aluno.setEndereco(cursor.getString(3));
+			aluno.setSite(cursor.getString(4));
+			aluno.setNota(cursor.getDouble(5));
+			aluno.setCaminhoFoto(cursor.getString(6));
+
+			alunos.add(aluno);
+
+		}
+
+		cursor.close();
 		return alunos;
+	}
+	
+	public void deleta(Aluno aluno) {
+		String[] args = {aluno.getId().toString()};
+		this.helper.getWritableDatabase().delete(Extras.TABELA, "id=?", args);
 	}
 
 }
